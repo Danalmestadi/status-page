@@ -6,13 +6,13 @@ import { RootState } from "./redux/store";
 import { useSelector } from "react-redux";
 import { setApiStatus } from "./redux/apiSliceReducer";
 import { useDispatch } from "react-redux";
-import { useEffect , useState} from "react";
+import { useEffect, useState } from "react";
 import { Subscribe } from "./subscribeButton";
 import { Footer } from "./components/footer";
 
 const StatusPage = () => {
   const dispatch = useDispatch();
-  const [apiStatusText, setApiStatusText] = useState('');
+  const [apiStatusText, setApiStatusText] = useState("");
 
   const apiStatus = useSelector((state: RootState) => state.api.status);
 
@@ -73,12 +73,12 @@ const StatusPage = () => {
     checkApiStatus();
   }, [apiStatus]);
 
-  const [statusColor, setStatusColor] = useState('');
-  const [textColor, setTextColor] = useState('');
+  const [statusColor, setStatusColor] = useState("");
+  const [textColor, setTextColor] = useState("");
   interface StatusMapping {
     [key: string]: { text: string; color: string };
   }
-  const statusMapping:StatusMapping = {
+  const statusMapping: StatusMapping = {
     "200": { text: "Operational", color: "green" },
     "429": { text: "Rate Limited", color: "yellow" },
     "503": { text: "Under Maintenance", color: "blue" },
@@ -105,7 +105,7 @@ const StatusPage = () => {
   const getTextColor = (color: string) => {
     switch (color) {
       case "green":
-        return"px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800";
+        return "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800";
       case "yellow":
         return "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800";
       case "blue":
@@ -167,9 +167,7 @@ const StatusPage = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right pr-8">
-                <span className={textColor}>
-      {apiStatusText}
-    </span>
+                  <span className={textColor}>{apiStatusText}</span>
                 </td>
               </tr>
             </tbody>
