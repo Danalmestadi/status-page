@@ -6,14 +6,13 @@ import { RootState } from "./redux/store";
 import { useSelector } from "react-redux";
 import { setApiStatus } from "./redux/apiSliceReducer";
 import { useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect , useState} from "react";
 import { Subscribe } from "./subscribeButton";
 import { Footer } from "./components/footer";
 
 const StatusPage = () => {
   const dispatch = useDispatch();
-  let apiStatusText = "";
-  let statusColor = "";
+  const [apiStatusText, setApiStatusText] = useState('');
 
   const apiStatus = useSelector((state: RootState) => state.api.status);
 
@@ -65,7 +64,7 @@ const StatusPage = () => {
 
     const intervalId = setInterval(() => {
       checkApiStatus();
-    }, 800000); // 80000 milliseconds =  seconds change based on
+    }, 60000); // 60000 milliseconds = 60 seconds change based on
 
     return () => clearInterval(intervalId);
   }, [checkApiStatus]);
@@ -74,49 +73,52 @@ const StatusPage = () => {
     checkApiStatus();
   }, [apiStatus]);
 
-  switch (apiStatus) {
-    case "200":
-      apiStatusText = "Operational";
-      statusColor = "green";
-      break;
-    case "429":
-      apiStatusText = "Rate Limited";
-      statusColor = "yellow";
-      break;
-    case "503":
-      apiStatusText = "Under Maintenance";
-      statusColor = "blue";
-      break;
-    case "504":
-      apiStatusText = "Gateway Timeout";
-      statusColor = "yellow";
-      break;
-    case "400":
-      apiStatusText = "Partial Outage";
-      statusColor = "orange";
-      break;
-    case "401":
-      apiStatusText = "Unauthorized";
-      statusColor = "red";
-      break;
-    case "403":
-      apiStatusText = "Forbidden";
-      statusColor = "red";
-      break;
-    case "404":
-      apiStatusText = "Not Found";
-      statusColor = "gray";
-      break;
-    case "500":
-      apiStatusText = "Degraded Performance";
-      statusColor = "red";
-      break;
-    default:
-      apiStatusText = "Unknown";
-      statusColor = "gray";
-      break;
+  const [statusColor, setStatusColor] = useState('');
+  const [textColor, setTextColor] = useState('');
+  interface StatusMapping {
+    [key: string]: { text: string; color: string };
   }
+  const statusMapping:StatusMapping = {
+    "200": { text: "Operational", color: "green" },
+    "429": { text: "Rate Limited", color: "yellow" },
+    "503": { text: "Under Maintenance", color: "blue" },
+    "504": { text: "Gateway Timeout", color: "yellow" },
+    "400": { text: "Partial Outage", color: "orange" },
+    "401": { text: "Unauthorized", color: "red" },
+    "403": { text: "Forbidden", color: "red" },
+    "404": { text: "Not Found", color: "gray" },
+    "500": { text: "Degraded Performance", color: "red" },
+    default: { text: "Unknown", color: "gray" },
+  };
 
+  useEffect(() => {
+    const setStatus = () => {
+      const { text, color } = statusMapping[apiStatus] || statusMapping.default;
+      setApiStatusText(text);
+      setStatusColor(color);
+      setTextColor(getTextColor(color));
+    };
+
+    setStatus();
+  }, [apiStatus]);
+
+  const getTextColor = (color: string) => {
+    switch (color) {
+      case "green":
+        return"px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800";
+      case "yellow":
+        return "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800";
+      case "blue":
+        return "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800";
+      case "orange":
+        return "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800";
+      case "red":
+        return "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800";
+      case "gray":
+      default:
+        return "px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800";
+    }
+  };
   return (
     <div className="min-h-screen overflow-scroll-hidden">
       <Head>
@@ -165,11 +167,9 @@ const StatusPage = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right pr-8">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-${statusColor}-100 text-${statusColor}-800`}
-                  >
-                    {apiStatusText}
-                  </span>
+                <span className={textColor}>
+      {apiStatusText}
+    </span>
                 </td>
               </tr>
             </tbody>
